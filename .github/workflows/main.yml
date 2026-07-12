@@ -2,7 +2,7 @@ name: Continuous Integration (CI)
 
 on:
   pull_request:
-    branches: [ dev, pre, pro ]
+    branches: [ main, dev, pre, pro ]
 
 jobs:
   # 1. Validar formato y estilo de código
