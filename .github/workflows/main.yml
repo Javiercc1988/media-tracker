@@ -1,0 +1,79 @@
+name: Continuous Integration (CI)
+
+on:
+  pull_request:
+    branches: [ dev, pre, pro ]
+
+jobs:
+  # 1. Validar formato y estilo de código
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Instala la versión mayor de pnpm que uses (la 9 es la actual para Node 24)
+
+      - name: Configurar entorno de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: 'pnpm' # Cacheo automático optimizado para pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile # Equivalente a 'npm ci', asegura que use el lockfile exacto
+
+      - name: Ejecutar Linter y Prettier
+        run: pnpm run lint
+
+  # 2. Validar que no existan errores de TypeScript
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Configurar entorno de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: 'pnpm'
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Verificar tipado de TypeScript
+        run: pnpm run typecheck
+
+  # 3. Compilar el proyecto (Solo si los dos jobs anteriores terminan en verde)
+  build:
+    needs: [lint-and-format, typecheck]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Configurar entorno de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: 'pnpm'
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Compilar la aplicación
+        run: pnpm run build
