@@ -9,6 +9,11 @@ const supabase = createClient(
 function App() {
   const [instruments, setInstruments] = useState([]);
 
+  console.log("SUPABASE_URL:", import.meta.env.VITE_SUPABASE_URL);
+  console.log(
+    "PUBLISHABLE_KEY:",
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  );
   useEffect(() => {
     getInstruments();
   }, []);
