@@ -6,28 +6,29 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
 );
 
+interface Instrument {
+  name: string;
+}
+
 function App() {
-  const [instruments, setInstruments] = useState([]);
+  const [instruments, setInstruments] = useState<Instrument[]>([]);
 
-  console.log("SUPABASE_URL:", import.meta.env.VITE_SUPABASE_URL);
-  console.log(
-    "PUBLISHABLE_KEY:",
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-  );
   useEffect(() => {
-    getInstruments();
-  }, []);
+    async function fetchInstruments() {
+      const { data, error } = await supabase.from("instruments").select();
 
-  async function getInstruments() {
-    const { data, error } = await supabase.from("instruments").select();
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-    if (error) {
-      console.error(error);
-      return;
+      if (!data) return;
+
+      setInstruments(data);
     }
 
-    setInstruments(data);
-  }
+    fetchInstruments();
+  }, []);
 
   return (
     <ul>
